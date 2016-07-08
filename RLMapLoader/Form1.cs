@@ -29,7 +29,10 @@ namespace RLMapLoader
             if (processes.Length > 0)
             {
                 rlMemory = new Memory(processes[0]);
-                trainingMapAddress = rlMemory.GetAddress("\"RocketLeague.exe\"+0164955C+464+54c+6a8+114+714");
+                //trainingMapAddress = rlMemory.GetAddress("\"RocketLeague.exe\"+0164955C+464+54c+6a8+114+714"); - 1.19
+                //trainingMapAddress = rlMemory.GetAddress("\"RocketLeague.exe\"+0164C44C+604+5e4+a8+714+514"); - 1.20
+                trainingMapAddress = rlMemory.GetAddress("\"RocketLeague.exe\"+01634DEC+3c+6a8+7c4+54+714"); // 1.21
+
                 byte[] buff = new byte[6];
                 rlMemory.ReadMemory(trainingMapAddress, buff, 6);
                 currentFreeplayMapTextBox.Text = System.Text.Encoding.Default.GetString(buff);
@@ -66,6 +69,35 @@ namespace RLMapLoader
         private void saveMapNameButton_Click(object sender, EventArgs e)
         {
             MessageBox.Show("I don't do anything yet.");
+        }
+
+        private void replacePauseTextCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if(replacePauseTextCheckBox.Checked)
+            {
+
+            } else
+            {
+
+            }
+        }
+
+        private void reloadGameButton_Click(object sender, EventArgs e)
+        {
+            /**
+            var processes = Process.GetProcessesByName("RocketLeague");
+
+            if (processes.Length == 0)
+            {
+                Process.Start(@"C:\Path\To\Your\RocketLeague.exe");
+            }
+
+            // Kill the extras
+            for (int i = 1; i < processes.Length; i++)
+            {
+                processes[i].Kill();
+            }
+            **/
         }
     }
 }
