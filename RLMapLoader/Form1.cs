@@ -259,7 +259,8 @@ namespace RLMapLoader
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 rlDirTextBox.Text = folderBrowserDialog1.SelectedPath;
-                Properties.Settings.Default.RLFolder = rlDirTextBox.Text;
+                Properties.Settings.Default.ModFolder = modsDirTextBox.Text;
+
                 Properties.Settings.Default.Save();
                 statusLabel.Text = "New mod path saved.";
             }
@@ -270,7 +271,7 @@ namespace RLMapLoader
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 modsDirTextBox.Text = folderBrowserDialog1.SelectedPath;
-                Properties.Settings.Default.ModFolder = modsDirTextBox.Text;
+                Properties.Settings.Default.RLFolder = rlDirTextBox.Text;
                 Properties.Settings.Default.Save();
                 statusLabel.Text = "New rl path saved.";
             }
