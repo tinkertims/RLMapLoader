@@ -1,7 +1,18 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="RLMapLoader.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ModFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">E:\STEAM\steamapps\common\rocketleague\TAGame\CookedPCConsole\mods\</Value>
+    </Setting>
+    <Setting Name="RLFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">E:\STEAM\steamapps\common\rocketleague\</Value>
+    </Setting>
+    <Setting Name="loadMapOnStart" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="lastMap" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
 </SettingsFile>
