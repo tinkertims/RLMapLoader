@@ -199,19 +199,19 @@ namespace RLMapLoader
                 return true;
 
             }
-            string parkpPath = Properties.Settings.Default.RLFolder + "TAGame\\CookedPCConsole\\Park_P.upk";
+            string parkpPath = Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk";
             // If default rl map, load from maps folder
             if (mapSelectComboBox.SelectedItem.ToString().Contains("[Default] ")) {
-                newMapPath = Properties.Settings.Default.RLFolder + "TAGame\\CookedPCConsole\\" + mapSelectComboBox.SelectedItem.ToString().Replace("[Default] ", ""); ;
+                newMapPath = Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\" + mapSelectComboBox.SelectedItem.ToString().Replace("[Default] ", ""); ;
             }
             else
             {
-                newMapPath = Properties.Settings.Default.ModFolder + mapSelectComboBox.SelectedItem;
+                newMapPath = Properties.Settings.Default.ModFolder + "\\" + mapSelectComboBox.SelectedItem;
 
             }
             // Backup original Park_P map
             try {
-                File.Copy(parkpPath, Properties.Settings.Default.RLFolder + "TAGame\\CookedPCConsole\\Park_P.upk.bak");
+                File.Copy(parkpPath, Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk.bak");
             } catch (IOException ex)
             {
                 statusLabel.Text = "Backup already exists.";
@@ -234,8 +234,8 @@ namespace RLMapLoader
 
         private void RestoreOriginalMap()
         {
-            string parkpPath = Properties.Settings.Default.RLFolder + "TAGame\\CookedPCConsole\\Park_P.upk";
-            string backupParkp = Properties.Settings.Default.RLFolder + "TAGame\\CookedPCConsole\\Park_P.upk.bak";
+            string parkpPath = Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk";
+            string backupParkp = Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk.bak";
             if (!File.Exists(backupParkp))
             {
                 MessageBox.Show("No backup exists, doing nothing.");
@@ -245,7 +245,7 @@ namespace RLMapLoader
             File.Delete(parkpPath);
             try
             {
-                File.Copy(Properties.Settings.Default.RLFolder + "TAGame\\CookedPCConsole\\Park_P.upk.bak", parkpPath);
+                File.Copy(Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk.bak", parkpPath);
                 statusLabel.Text = "Original Park_P restored.";
             }
             catch (IOException ex)
@@ -258,7 +258,7 @@ namespace RLMapLoader
         {
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
-                rlDirTextBox.Text = folderBrowserDialog1.SelectedPath;
+                modsDirTextBox.Text = folderBrowserDialog1.SelectedPath;
                 Properties.Settings.Default.ModFolder = modsDirTextBox.Text;
 
                 Properties.Settings.Default.Save();
@@ -270,7 +270,7 @@ namespace RLMapLoader
         {
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
-                modsDirTextBox.Text = folderBrowserDialog1.SelectedPath;
+                rlDirTextBox.Text = folderBrowserDialog1.SelectedPath;
                 Properties.Settings.Default.RLFolder = rlDirTextBox.Text;
                 Properties.Settings.Default.Save();
                 statusLabel.Text = "New rl path saved.";
@@ -279,8 +279,8 @@ namespace RLMapLoader
 
         private void deleteParkPBackupToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string parkpPath = Properties.Settings.Default.RLFolder + "TAGame\\CookedPCConsole\\Park_P.upk";
-            string backupParkp = Properties.Settings.Default.RLFolder + "TAGame\\CookedPCConsole\\Park_P.upk.bak";
+            string parkpPath = Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk";
+            string backupParkp = Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk.bak";
 
             if (!File.Exists(parkpPath))
             {
