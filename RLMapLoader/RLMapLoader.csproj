@@ -52,12 +52,22 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="MapPackage.cs" />
+    <Compile Include="MapPackageManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MapPackageManager.Designer.cs">
+      <DependentUpon>MapPackageManager.cs</DependentUpon>
+    </Compile>
     <Compile Include="Memory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win32.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MapPackageManager.resx">
+      <DependentUpon>MapPackageManager.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

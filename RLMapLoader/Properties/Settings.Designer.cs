@@ -61,13 +61,25 @@ namespace RLMapLoader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("[Default] Park_P.upk")]
         public string lastMap {
             get {
                 return ((string)(this["lastMap"]));
             }
             set {
                 this["lastMap"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool restoreDefaultMapOnClose {
+            get {
+                return ((bool)(this["restoreDefaultMapOnClose"]));
+            }
+            set {
+                this["restoreDefaultMapOnClose"] = value;
             }
         }
     }

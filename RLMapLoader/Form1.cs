@@ -25,10 +25,14 @@ namespace RLMapLoader
 
         private Memory rlMemory;
         IntPtr trainingMapAddress;
+        MapPackageManager mpm;
 
         public Form1()
         {
             InitializeComponent();
+
+            // Initialize Map Package Manager
+            mpm = new MapPackageManager();
 
             // Load Settings
             if (Properties.Settings.Default.RLFolder != "")
@@ -40,13 +44,12 @@ namespace RLMapLoader
                 modsDirTextBox.Text = Properties.Settings.Default.ModFolder;
             }
             loadOnStartCheckBox.Checked = Properties.Settings.Default.loadMapOnStart;
+            restoreDefaultMapCheckBox.Checked = Properties.Settings.Default.restoreDefaultMapOnClose;
 
             //InitializeMemoryAddresses();
             InitializeCustomMapList();
 
             // Add default maps to selection
-            mapSelectComboBox.Items.Add("[Default] Park_P.upk");
-
             mapSelectComboBox.Items.Add("[Default] EuroStadium_P.upk");
             mapSelectComboBox.Items.Add("[Default] EuroStadium_Rainy_P.upk");
 
@@ -61,6 +64,7 @@ namespace RLMapLoader
 
             mapSelectComboBox.Items.Add("[Default] NeoTokyo_P.upk");
 
+            mapSelectComboBox.Items.Add("[Default] Park_P.upk");
             mapSelectComboBox.Items.Add("[Default] Park_Night_P.upk");
             mapSelectComboBox.Items.Add("[Default] Park_Rainy_P.upk");
 
@@ -84,14 +88,15 @@ namespace RLMapLoader
                 mapSelectComboBox.SelectedItem = Properties.Settings.Default.lastMap;
             } else
             {
-                mapSelectComboBox.SelectedIndex = 0;
+                // TO DO: replace this with hash detection to determine actual map, not just default to Park_P when unknown
+                mapSelectComboBox.SelectedIndex = mapSelectComboBox.Items.Count - 13;
 
             }
 
             if (loadOnStartCheckBox.Checked)
             {
-                // Load map
-                LoadCustomMap();
+                // Load map, if we had disabled restoring default park_p on last close, don't backup.
+                LoadCustomMap(Properties.Settings.Default.restoreDefaultMapOnClose);
             }
 
         }
@@ -143,7 +148,7 @@ namespace RLMapLoader
 
         private void loadMapButton_Click(object sender, EventArgs e)
         {
-            LoadCustomMap();
+            LoadCustomMap(Properties.Settings.Default.lastMap.Equals("[Default] Park_P.upk"));
             /**
             if(rlMemory != null)
             {
@@ -161,16 +166,6 @@ namespace RLMapLoader
             MessageBox.Show("I don't do anything yet.");
         }
 
-        private void replacePauseTextCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if(replacePauseTextCheckBox.Checked)
-            {
-
-            } else
-            {
-
-            }
-        }
 
         private void reloadGameButton_Click(object sender, EventArgs e)
         {
@@ -190,68 +185,130 @@ namespace RLMapLoader
             **/
         }
 
-        private Boolean LoadCustomMap()
+        private Boolean LoadCustomMap(Boolean backupDefaultMap)
         {
-            string newMapPath = "";
-
-            if (mapSelectComboBox.SelectedItem.ToString().Equals("[Default] Park_P.upk")) {
-                RestoreOriginalMap();
-                return true;
-
+            Process[] processes = Process.GetProcessesByName("RocketLeague");
+            if (processes.Length > 0)
+            {
+                statusLabel.Text = "Unable to load map, please exit Rocket League and try again.";
+                return false;
+            } else if(!Directory.Exists(Properties.Settings.Default.RLFolder))
+            {
+                statusLabel.Text = "Unable to load map, please select a valid Rocket League Folder.";
+                return false;
             }
-            string parkpPath = Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk";
-            // If default rl map, load from maps folder
-            if (mapSelectComboBox.SelectedItem.ToString().Contains("[Default] ")) {
-                newMapPath = Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\" + mapSelectComboBox.SelectedItem.ToString().Replace("[Default] ", ""); ;
+            else if (!Directory.Exists(Properties.Settings.Default.ModFolder))
+            {
+                statusLabel.Text = "Unable to load map, please select a valid Mods Folder.";
+                return false;
             }
             else
             {
-                newMapPath = Properties.Settings.Default.ModFolder + "\\" + mapSelectComboBox.SelectedItem;
+                string newMapPath = "";
+
+                // Make sure the last map loaded wasn't Park_P otherwise we will end up deleting the UPK for no reason.
+                if (mapSelectComboBox.SelectedItem.ToString().Equals("[Default] Park_P.upk") && !Properties.Settings.Default.lastMap.Equals("[Default] Park_P.upk"))
+                {
+                    RestoreOriginalMap();
+                    return true;
+
+                } // Park_P is already loaded
+                else if (mapSelectComboBox.SelectedItem.ToString().Equals("[Default] Park_P.upk") && Properties.Settings.Default.lastMap.Equals("[Default] Park_P.upk"))
+                {
+                    statusLabel.Text = "Park_P is already loaded, doing nothing.";
+                    return true;
+                }
+                string parkpPath = Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk";
+                // If default rl map, load from maps folder
+                if (mapSelectComboBox.SelectedItem.ToString().Contains("[Default] "))
+                {
+                    newMapPath = Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\" + mapSelectComboBox.SelectedItem.ToString().Replace("[Default] ", ""); ;
+                }
+                else
+                {
+                    newMapPath = Properties.Settings.Default.ModFolder + "\\" + mapSelectComboBox.SelectedItem;
+
+                }
+                // Backup original Park_P map if current Park_P map is original
+                if (backupDefaultMap)
+                {
+                    try
+                    {
+                        File.Copy(parkpPath, Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk.bak");
+                    }
+                    catch (IOException ex)
+                    {
+                        statusLabel.Text = "Backup already exists.";
+                    }
+                }
+
+                // Create link to selected map
+                try
+                {
+                    File.Delete(parkpPath);
+                }
+                catch
+                {
+
+                }
+
+                statusLabel.Text = mapSelectComboBox.SelectedItem.ToString().Replace("[Default] ", "") + " loaded successfully";
+
+                // Only update last loaded map on load button click...duh
+                Properties.Settings.Default.lastMap = mapSelectComboBox.SelectedItem.ToString();
+                Properties.Settings.Default.Save();
+
+                return CreateHardLink(parkpPath, newMapPath, IntPtr.Zero);
+            
 
             }
-            // Backup original Park_P map
-            try {
-                File.Copy(parkpPath, Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk.bak");
-            } catch (IOException ex)
-            {
-                statusLabel.Text = "Backup already exists.";
-            }
-
-            // Create link to selected map
-            File.Delete(parkpPath);
-
-            statusLabel.Text = mapSelectComboBox.SelectedItem.ToString().Replace("[Default] ", "") + " loaded successfully";
-            return CreateHardLink(parkpPath, newMapPath, IntPtr.Zero);
-
 
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Revert Park_P back to default map
-            RestoreOriginalMap();
+            // Revert Park_P back to default map if enabled
+            if(Properties.Settings.Default.restoreDefaultMapOnClose)
+                RestoreOriginalMap();
         }
 
         private void RestoreOriginalMap()
         {
             string parkpPath = Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk";
             string backupParkp = Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk.bak";
-            if (!File.Exists(backupParkp))
+            if (!File.Exists(backupParkp) )
             {
-                MessageBox.Show("No backup exists, doing nothing.");
+                if (!Properties.Settings.Default.lastMap.Equals("[Default] Park_P.upk"))
+                {
+                    MessageBox.Show("No backup exists, unable to restore backup.");
+                    return;
+                } else
+                {
+
+                }
+            }
+            try {
+                File.Delete(parkpPath);
+            }
+            catch
+            {
+                statusLabel.Text = "Unable to delete current Park_P file.  File was not restored.";
                 return;
             }
-
-            File.Delete(parkpPath);
             try
             {
                 File.Copy(Properties.Settings.Default.RLFolder + "\\TAGame\\CookedPCConsole\\Park_P.upk.bak", parkpPath);
                 statusLabel.Text = "Original Park_P restored.";
+ 
             }
             catch (IOException ex)
             {
                 statusLabel.Text = "Park_P already exists.";
+
             }
+            mapSelectComboBox.SelectedItem = "[Default] Park_P.upk";
+            Properties.Settings.Default.lastMap = "[Default] Park_P.upk";
+            Properties.Settings.Default.Save();
         }
 
         private void selectModsButton_Click(object sender, EventArgs e)
@@ -273,7 +330,7 @@ namespace RLMapLoader
                 rlDirTextBox.Text = folderBrowserDialog1.SelectedPath;
                 Properties.Settings.Default.RLFolder = rlDirTextBox.Text;
                 Properties.Settings.Default.Save();
-                statusLabel.Text = "New rl path saved.";
+                statusLabel.Text = "New Rocket League path saved.";
             }
         }
 
@@ -292,6 +349,10 @@ namespace RLMapLoader
                     File.Delete(backupParkp);
                     statusLabel.Text = "Park_P backup deleted.";
                 }
+            } else
+            {
+                File.Delete(backupParkp);
+                statusLabel.Text = "Park_P backup deleted.";
             }
                 
         }
@@ -305,8 +366,48 @@ namespace RLMapLoader
 
         private void mapSelectComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Properties.Settings.Default.lastMap = mapSelectComboBox.SelectedItem.ToString();
+
+        }
+
+        private void mapPackageManagerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            mpm.Show();
+        }
+
+        private void restoreOriginalParkPToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RestoreOriginalMap();
+        }
+
+        private void restoreDefaultMapCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.restoreDefaultMapOnClose = restoreDefaultMapCheckBox.Checked;
             Properties.Settings.Default.Save();
+        }
+
+        private void restoreDefaultSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Need to save the last loaded map or things would get wonky.  Maybe we should restore default Park_P on settings reset?
+            String currentlyLoadedMap = Properties.Settings.Default.lastMap;
+
+            Properties.Settings.Default.Reset();
+            Properties.Settings.Default.Save();
+
+            // Load Settings
+            if (Properties.Settings.Default.RLFolder != "")
+            {
+                rlDirTextBox.Text = Properties.Settings.Default.RLFolder;
+            }
+            if (Properties.Settings.Default.ModFolder != "")
+            {
+                modsDirTextBox.Text = Properties.Settings.Default.ModFolder;
+            }
+            loadOnStartCheckBox.Checked = Properties.Settings.Default.loadMapOnStart;
+            restoreDefaultMapCheckBox.Checked = Properties.Settings.Default.restoreDefaultMapOnClose;
+
+            InitializeCustomMapList();
+            mapSelectComboBox.SelectedItem = currentlyLoadedMap;
+            Properties.Settings.Default.lastMap = currentlyLoadedMap;
         }
     }
 }

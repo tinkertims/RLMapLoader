@@ -12,7 +12,10 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="lastMap" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">[Default] Park_P.upk</Value>
+    </Setting>
+    <Setting Name="restoreDefaultMapOnClose" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>
