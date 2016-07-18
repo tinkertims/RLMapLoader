@@ -32,7 +32,7 @@ namespace RLMapLoader
             InitializeComponent();
 
             // Initialize Map Package Manager
-            mpm = new MapPackageManager();
+            mpm = new MapPackageManager(this);
 
             // Load Settings
             if (Properties.Settings.Default.RLFolder != "")
@@ -366,11 +366,12 @@ namespace RLMapLoader
 
         private void mapSelectComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            // Load preview when map selected
         }
 
         private void mapPackageManagerToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            statusLabel.Text = "Loading Package Manager...";
             mpm.Show();
         }
 
@@ -408,6 +409,71 @@ namespace RLMapLoader
             InitializeCustomMapList();
             mapSelectComboBox.SelectedItem = currentlyLoadedMap;
             Properties.Settings.Default.lastMap = currentlyLoadedMap;
+        }
+
+        private void rescanModsFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RescanModsFolder();
+
+        }
+        public void RescanModsFolder()
+        {
+            mapSelectComboBox.Items.Clear();
+
+            InitializeCustomMapList();
+
+            // Add default maps to selection
+            mapSelectComboBox.Items.Add("[Default] EuroStadium_P.upk");
+            mapSelectComboBox.Items.Add("[Default] EuroStadium_Rainy_P.upk");
+
+            mapSelectComboBox.Items.Add("[Default] HoopsStadium_P.upk");
+
+            mapSelectComboBox.Items.Add("[Default] Labs_CirclePillars_P.upk");
+            mapSelectComboBox.Items.Add("[Default] Labs_Cosmic_P.upk");
+            mapSelectComboBox.Items.Add("[Default] Labs_DoubleGoal_P.upk");
+            mapSelectComboBox.Items.Add("[Default] Labs_Underpass_P.upk");
+            mapSelectComboBox.Items.Add("[Default] Labs_Underpass_v0_p.upk");
+            mapSelectComboBox.Items.Add("[Default] Labs_Utopia_P.upk");
+
+            mapSelectComboBox.Items.Add("[Default] NeoTokyo_P.upk");
+
+            mapSelectComboBox.Items.Add("[Default] Park_P.upk");
+            mapSelectComboBox.Items.Add("[Default] Park_Night_P.upk");
+            mapSelectComboBox.Items.Add("[Default] Park_Rainy_P.upk");
+
+            mapSelectComboBox.Items.Add("[Default] Stadium_P.upk");
+            mapSelectComboBox.Items.Add("[Default] Stadium_Winter_P.upk");
+
+            mapSelectComboBox.Items.Add("[Default] test_Volleyball.upk");
+
+            mapSelectComboBox.Items.Add("[Default] TrainStation_P.upk");
+            mapSelectComboBox.Items.Add("[Default] TrainStation_Night_P.upk");
+
+            mapSelectComboBox.Items.Add("[Default] TutorialAdvanced.upk");
+            mapSelectComboBox.Items.Add("[Default] TutorialTest.upk");
+
+            mapSelectComboBox.Items.Add("[Default] UtopiaStadium_P.upk");
+            mapSelectComboBox.Items.Add("[Default] UtopiaStadium_Dusk_P.upk");
+
+            mapSelectComboBox.Items.Add("[Default] Wasteland_P.upk");
+
+            if (Properties.Settings.Default.lastMap != "")
+            {
+                mapSelectComboBox.SelectedItem = Properties.Settings.Default.lastMap;
+            }
+            else
+            {
+                // TO DO: replace this with hash detection to determine actual map, not just default to Park_P when unknown
+                mapSelectComboBox.SelectedIndex = mapSelectComboBox.Items.Count - 13;
+
+            }
+
+            statusLabel.Text = "Finished rescanning the mods folder for maps.";
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
