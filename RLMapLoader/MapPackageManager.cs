@@ -155,7 +155,6 @@ namespace RLMapLoader
                         webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
 
                         webClient.DownloadFileAsync(downloadUrl, Properties.Settings.Default.ModFolder + "\\" + filename);
-                        senderGrid.Rows[e.RowIndex].Cells["FileUrl"].Value = "Update";
                     }
                 } else
                 {
@@ -166,7 +165,6 @@ namespace RLMapLoader
                     webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
 
                     webClient.DownloadFileAsync(downloadUrl, Properties.Settings.Default.ModFolder + "\\" + filename);
-                    senderGrid.Rows[e.RowIndex].Cells["FileUrl"].Value = "Update";
                 }
             }
         }
